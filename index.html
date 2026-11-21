@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexTech Gadgets | Future-Ready Tech Store</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="#home" class="brand" onclick="navigate('home'); return false;">⚡ NexTech<span>Gadgets</span></a>
+      <nav class="nav-links">
+        <a href="#home" onclick="navigate('home'); return false;">Home</a>
+        <a href="#products" onclick="navigate('products'); return false;">Gadgets</a>
+        <a href="#about" onclick="navigate('about'); return false;">About</a>
+        <a href="#faq" onclick="navigate('faq'); return false;">FAQ</a>
+        <a href="#contact" onclick="navigate('contact'); return false;">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn-icon" onclick="navigate('cart')">🛒 Cart (<span id="cart-count">0</span>)</button>
+        <div id="auth-nav"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="container main-content">
+
+    <!-- 1. HOME PAGE -->
+    <section id="view-home" class="view">
+      <div class="hero">
+        <div class="hero-text">
+          <span class="badge">2026 NEXT-GEN COLLECTION</span>
+          <h1>Upgrade Your Everyday Tech Ecosystem</h1>
+          <p>Precision-engineered audio, wearables, peripherals, and smart devices backed by a 2-year warranty and cryptographic account protection.</p>
+          <div class="hero-btns">
+            <button class="btn btn-primary" onclick="navigate('products')">Shop Gadgets</button>
+            <button class="btn btn-outline" onclick="navigate('about')">Our Story</button>
+          </div>
+        </div>
+      </div>
+      <h2 class="section-title">Featured Hardware</h2>
+      <div id="home-featured-grid" class="product-grid"></div>
+    </section>
+
+    <!-- 2. PRODUCTS PAGE -->
+    <section id="view-products" class="view hidden">
+      <div class="page-header">
+        <h2>Gadget Catalog</h2>
+        <div class="filters">
+          <input type="text" id="search-input" placeholder="Search gadgets..." oninput="renderProducts()" />
+          <select id="category-filter" onchange="renderProducts()">
+            <option value="All">All Categories</option>
+            <option value="Audio">Audio</option>
+            <option value="Wearables">Wearables</option>
+            <option value="Peripherals">Peripherals</option>
+            <option value="Power">Power</option>
+            <option value="Smart Home">Smart Home</option>
+          </select>
+          <select id="sort-filter" onchange="renderProducts()">
+            <option value="default">Sort: Featured</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating">Top Rated</option>
+          </select>
+        </div>
+      </div>
+      <div id="products-grid" class="product-grid"></div>
+    </section>
+
+    <!-- 3. PRODUCT DETAIL PAGE -->
+    <section id="view-product-detail" class="view hidden">
+      <button class="btn btn-outline btn-sm" onclick="navigate('products')">← Back to Catalog</button>
+      <div id="product-detail-container" class="detail-box"></div>
+    </section>
+
+    <!-- 4. LOG IN PAGE -->
+    <section id="view-login" class="view hidden">
+      <div class="auth-card">
+        <h2>Welcome Back</h2>
+        <p class="muted">Sign in to access your cart, orders, and saved devices.</p>
+        <div id="login-alert" class="alert hidden"></div>
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <label>Email Address</label>
+          <input type="email" id="login-email" required placeholder="you@example.com" />
+          <label>Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" />
+          <div class="form-row">
+            <a href="#forgot" onclick="navigate('forgot'); return false;">Forgot Password?</a>
+          </div>
+          <button type="submit" id="login-submit-btn" class="btn btn-primary full-width">Log In</button>
+        </form>
+        <div class="demo-box">
+          <small>Demo: <code>demo@nextech.io</code> / <code>Demo@1234</code></small>
+          <button type="button" class="btn btn-sm btn-outline" onclick="fillDemo()">Auto-Fill</button>
+        </div>
+        <p class="auth-switch">Don't have an account? <a href="#signup" onclick="navigate('signup'); return false;">Sign Up</a></p>
+      </div>
+    </section>
+
+    <!-- 5. SIGN UP PAGE -->
+    <section id="view-signup" class="view hidden">
+      <div class="auth-card">
+        <h2>Create Account</h2>
+        <p class="muted">Protected with SHA-256 hashing & security recovery.</p>
+        <div id="signup-alert" class="alert hidden"></div>
+        <form onsubmit="handleSignup(event)">
+          <label>Full Name</label>
+          <input type="text" id="signup-name" required placeholder="Alex Mercer" />
+          <label>Email Address</label>
+          <input type="email" id="signup-email" required placeholder="alex@example.com" />
+          <label>Password (8+ chars, Uppercase, Lowercase, Number, Symbol)</label>
+          <input type="password" id="signup-password" required oninput="checkPasswordStrength(this.value)" placeholder="StrongPass@2026" />
+          <div class="strength-meter"><div id="strength-bar"></div></div>
+          <label>Security Question (For Password Recovery)</label>
+          <select id="signup-question">
+            <option>What was the name of your first gadget?</option>
+            <option>What city were you born in?</option>
+            <option>What is your favorite retro video game?</option>
+          </select>
+          <label>Security Answer</label>
+          <input type="text" id="signup-answer" required placeholder="Your secret answer" />
+          <button type="submit" class="btn btn-primary full-width">Create Account</button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="#login" onclick="navigate('login'); return false;">Log In</a></p>
+      </div>
+    </section>
+
+    <!-- 6. FORGOT PASSWORD PAGE -->
+    <section id="view-forgot" class="view hidden">
+      <div class="auth-card">
+        <h2>Account Recovery</h2>
+        <p class="muted">Reset your password via 6-digit OTP or Security Question.</p>
+        <div id="forgot-alert" class="alert hidden"></div>
+
+        <!-- Step 1 -->
+        <form id="forgot-step-1" onsubmit="handleForgotStep1(event)">
+          <label>Registered Email Address</label>
+          <input type="email" id="forgot-email" required placeholder="demo@nextech.io" />
+          <button type="submit" class="btn btn-primary full-width">Send Verification Code</button>
+        </form>
+
+        <!-- Step 2 -->
+        <form id="forgot-step-2" class="hidden" onsubmit="handleForgotStep2(event)">
+          <label>Verification Method</label>
+          <select id="recovery-method" onchange="toggleRecoveryLabel()">
+            <option value="otp">6-Digit Email OTP</option>
+            <option value="security">Security Question</option>
+          </select>
+          <p id="security-question-display" class="muted hidden"></p>
+          <label id="recovery-input-label">Enter 6-Digit OTP</label>
+          <input type="text" id="recovery-value" required placeholder="123456" />
+          <label>New Strong Password</label>
+          <input type="password" id="reset-new-password" required placeholder="NewPass@2026" />
+          <button type="submit" class="btn btn-primary full-width">Reset Password</button>
+        </form>
+        <p class="auth-switch"><a href="#login" onclick="navigate('login'); return false;">← Back to Log In</a></p>
+      </div>
+    </section>
+
+    <!-- 7. CART PAGE -->
+    <section id="view-cart" class="view hidden">
+      <h2>Your Shopping Cart</h2>
+      <div id="cart-container" class="cart-layout"></div>
+    </section>
+
+    <!-- 8. CHECKOUT PAGE -->
+    <section id="view-checkout" class="view hidden">
+      <h2>Secure Checkout</h2>
+      <div class="checkout-layout">
+        <form class="card" onsubmit="handleCheckout(event)">
+          <h3>Shipping Details</h3>
+          <label>Full Name</label>
+          <input type="text" id="ship-name" required />
+          <label>Street Address</label>
+          <input type="text" id="ship-address" required placeholder="42 Innovation Way" />
+          <div class="grid-2">
+            <div><label>City</label><input type="text" id="ship-city" required /></div>
+            <div><label>Postal Code</label><input type="text" id="ship-zip" required /></div>
+          </div>
+          <h3>Payment Method</h3>
+          <select id="pay-method">
+            <option value="Credit/Debit Card">Credit / Debit Card</option>
+            <option value="UPI / Digital Wallet">UPI / Digital Wallet</option>
+            <option value="Cash on Delivery">Cash on Delivery</option>
+          </select>
+          <button type="submit" class="btn btn-primary full-width">Place Order</button>
+        </form>
+        <div id="checkout-summary" class="card"></div>
+      </div>
+    </section>
+
+    <!-- 9. ABOUT US PAGE -->
+    <section id="view-about" class="view hidden">
+      <div class="content-card">
+        <h2>About NexTech Gadgets</h2>
+        <p>Founded in 2026, NexTech Gadgets curates high-performance consumer electronics, studio-grade audio gear, and smart workspace peripherals. Every product undergoes a 40-point hardware endurance benchmark before hitting our shelves.</p>
+        <div class="grid-3">
+          <div class="stat-box"><h3>50K+</h3><p>Verified Tech Buyers</p></div>
+          <div class="stat-box"><h3>2-Year</h3><p>Direct Hardware Warranty</p></div>
+          <div class="stat-box"><h3>24/7</h3><p>Engineer Support Desk</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. CONTACT US PAGE -->
+    <section id="view-contact" class="view hidden">
+      <div class="auth-card">
+        <h2>Contact Support</h2>
+        <p class="muted">Have a hardware or order inquiry? Reach our engineering desk.</p>
+        <form onsubmit="event.preventDefault(); showToast('Message sent! Ticket #NT-8492 created.'); this.reset();">
+          <label>Your Name</label>
+          <input type="text" required />
+          <label>Email</label>
+          <input type="email" required />
+          <label>Message</label>
+          <textarea rows="4" required placeholder="How can we help?"></textarea>
+          <button type="submit" class="btn btn-primary full-width">Send Inquiry</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 11. FAQ PAGE -->
+    <section id="view-faq" class="view hidden">
+      <div class="content-card">
+        <h2>Frequently Asked Questions</h2>
+        <details open><summary>How is my password secured?</summary><p>Passwords are salted and hashed with SHA-256 cryptographic hashing. Accounts automatically lock for 30 seconds after 3 consecutive failed login attempts.</p></details>
+        <details><summary>What is your return & warranty policy?</summary><p>All gadgets include a 30-day no-questions-asked return window and a 24-month manufacturer defect warranty.</p></details>
+        <details><summary>Are there any active promo codes?</summary><p>Use code <strong>GADGET10</strong> at cart checkout for 10% off your order.</p></details>
+      </div>
+    </section>
+
+    <!-- 12. TERMS & CONDITIONS PAGE -->
+    <section id="view-terms" class="view hidden">
+      <div class="content-card">
+        <h2>Terms & Conditions</h2>
+        <p>By accessing NexTech Gadgets, you agree to provide accurate account registration information, maintain the confidentiality of your credentials, and abide by applicable commercial and export laws for electronic hardware.</p>
+        <p>All product specifications, pricing, and promotional codes are subject to availability. Orders are confirmed upon payment authorization.</p>
+      </div>
+    </section>
+
+    <!-- 13. PRIVACY POLICY PAGE -->
+    <section id="view-privacy" class="view hidden">
+      <div class="content-card">
+        <h2>Privacy Policy</h2>
+        <p>We collect only the personal data strictly required to authenticate your account, process orders, and deliver shipments. Passwords and security recovery answers are irreversibly hashed using SHA-256.</p>
+        <p>NexTech Gadgets never sells personal data or browsing telemetry to third-party advertisers.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>© 2026 NexTech Gadgets Inc. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#about" onclick="navigate('about'); return false;">About Us</a>
+        <a href="#contact" onclick="navigate('contact'); return false;">Contact Us</a>
+        <a href="#faq" onclick="navigate('faq'); return false;">FAQ</a>
+        <a href="#terms" onclick="navigate('terms'); return false;">Terms & Conditions</a>
+        <a href="#privacy" onclick="navigate('privacy'); return false;">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
